@@ -1,9 +1,12 @@
 import socket
 import threading
 
-from Player import Player
+import pygame
 
-HEADER = 64
+from Player import Player
+from GameModeConstraints import GameModeConstraints
+
+HEADER = 128
 PORT = 5050
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
@@ -38,10 +41,14 @@ def setScore(name: str, score: int):
 
 def getWinner():
     global players
-
-    for player in players:
-        if player.score == max(players[0].score, players[1].score):
-            return player
+    if not players:
+        return None
+    max_score = max([player.score for player in players])
+    winner = [player for player in players if player.score == max_score]
+    if len(winner) == 1:
+        return winner[0]
+    else:
+        return None
 
 
 def handle_client(conn, addr):
@@ -54,21 +61,32 @@ def handle_client(conn, addr):
         name_player = receive(conn, addr)
         players.append(Player(name_player))
 
-        while len(players) != 2:
+        game_mode = int(receive(conn, addr))
+
+        max_players = {
+            GameModeConstraints.TWO_PLAYERS: 2,
+            GameModeConstraints.THREE_PLAYERS: 3,
+            GameModeConstraints.FOUR_PLAYERS: 4,
+        }
+
+        while len(players) != max_players[game_mode]:
             pass
 
         send(conn, START_GAME_MESSAGE)
 
-        score = int(receive(conn, addr))
+        score = receive(conn, addr)
+        if score != '':
+            score = int(score)
+        else:
+            score = 0
         setScore(name_player, score)
         while not checkSuccess():
             pass
-
-        if getWinner().name == name_player:
+        winner = getWinner()
+        if winner is not None and winner.name == name_player:
             send(conn, "You win!")
         else:
             send(conn, "You lose!")
-
         players.clear()
 
         msg = receive(conn, addr)
@@ -108,6 +126,12 @@ def start():
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
         if threading.active_count() == 3:
             start_game = True
+        elif threading.active_count() == 4:
+            start_game = True
+        elif threading.active_count() == 5:
+            start_game = True
+        elif threading.active_count() > 5:
+            print("Server is full.")
 
 
 print("[STARTING] Server is starting...")
