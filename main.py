@@ -76,43 +76,43 @@ def start_screen(screen):
 
     # Create input
     playerNameEntry = pygame_gui.elements.UITextEntryLine(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 50), (200, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 70), (200, 50)),
         manager=manager,
         placeholder_text="Type your name"
     )
     ipEntry = pygame_gui.elements.UITextEntryLine(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2), (200, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 20), (200, 50)),
         manager=manager,
         placeholder_text="Type IP"
     )
 
     # Create start button
     buttonPractice = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 50), (150, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 30), (150, 50)),
         text="Practice",
         manager=manager,
     )
 
     buttonCompete = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 100), (150, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 80), (150, 50)),
         text="Fight",
         manager=manager,
     )
 
     buttonThreeplayer = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 150), (150, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 130), (150, 50)),
         text="ThreePlayer",
         manager=manager,
     )
 
     buttonFourplayer = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 200), (150, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 180), (150, 50)),
         text="FourPlayer",
         manager=manager,
     )
 
     buttonQuit = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 250), (150, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 230), (150, 50)),
         text="Quit",
         manager=manager,
     )
