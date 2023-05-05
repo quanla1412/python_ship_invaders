@@ -9,6 +9,7 @@ class Player:
         self.hp = hp
         self.name = name
         self.score = score
+        self.isDead = False
 
         if img_path:
             self.img = pygame.image.load('spaceship.png')
