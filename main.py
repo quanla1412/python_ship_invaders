@@ -75,18 +75,11 @@ def start_screen(screen):
     manager = pygame_gui.UIManager((800, 600))
 
     # Create input
-    title = pygame_gui.elements.UILabel(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 150), (200, 50)),
-        text="Space Invader",
-        manager=manager,
-    )
-
     playerNameEntry = pygame_gui.elements.UITextEntryLine(
         relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 50), (200, 50)),
         manager=manager,
         placeholder_text="Type your name"
     )
-
     ipEntry = pygame_gui.elements.UITextEntryLine(
         relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2), (200, 50)),
         manager=manager,
@@ -95,31 +88,31 @@ def start_screen(screen):
 
     # Create start button
     buttonPractice = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 50), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 50), (150, 50)),
         text="Practice",
         manager=manager,
     )
 
     buttonCompete = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 100), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 100), (150, 50)),
         text="Fight",
         manager=manager,
     )
 
     buttonThreeplayer = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 200, 600 / 2 + 100), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 150), (150, 50)),
         text="ThreePlayer",
         manager=manager,
     )
 
     buttonFourplayer = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 200, 600 / 2 + 150), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 200), (150, 50)),
         text="FourPlayer",
         manager=manager,
     )
 
     buttonQuit = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 150), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 250), (150, 50)),
         text="Quit",
         manager=manager,
     )
@@ -223,8 +216,9 @@ def start_screen(screen):
         manager.update(time_delta)
         screen.blit(background, (0, 0))
         screen.blit(volumeImg, (760, 15))
+        title = pygame.image.load('spacelogo-image.png')
+        screen.blit(title, (255, 60))
         manager.draw_ui(screen)
-        title.show()
         pygame.display.update()
 
 
@@ -304,6 +298,7 @@ def startGame(name_player):
             client.send(str(game_mode))
             client.receive()
         time = 60
+        score_value = 0
         start_ticks = pygame.time.get_ticks()
         while running:
             seconds = (pygame.time.get_ticks() - start_ticks) / 1000
@@ -335,6 +330,8 @@ def startGame(name_player):
 
                 collide = thienThach[i].isCollide(player)
                 if collide:
+                    explosionSound = mixer.Sound("explosion.wav")
+                    explosionSound.play()
                     thienThach[i].x = random.randint(0, 480)
                     thienThach[i].y = 0
                     player.hp -= 1
@@ -430,7 +427,7 @@ def startGame(name_player):
 
                 collision = enemy[i].isCollision(bullet)
                 if collision:
-                    explosionSound = mixer.Sound("explosion.wav")
+                    explosionSound = mixer.Sound("score.wav")
                     explosionSound.play()
                     bullet.y = 480
                     bullet.state = "ready"
