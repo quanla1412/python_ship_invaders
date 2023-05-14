@@ -1,10 +1,14 @@
-import math
+
 import random
 import pygame
 from pygame import mixer
 import pygame_gui
 import re
 
+from Enemy import Enemy
+from Bullet import Bullet
+from Player import Player
+from ThienThach import ThienThach
 from GameModeConstraints import GameModeConstraints
 from Client import Client
 
@@ -13,38 +17,44 @@ screen = pygame.display.set_mode((800, 600))
 font = pygame.font.Font(None, 36)
 background = pygame.image.load('background.png')
 
-mixer.music.load("background.wav")
-# mixer.music.play(-1)
+
+# Kích thước của hình chữ nhật
+rect_width = 50
+rect_height = 50
+
+# Tạo hình chữ nhật
+rect = pygame.Rect(0, 0, rect_width, rect_height)
+
+# Đặt tọa độ cho hình chữ nhật
+rect.x = 740 # Tọa độ x
+rect.y = 5 # Tọa độ y
+
+pygame.mixer.music.load("background.wav")
+volumeImg = pygame.image.load('volume-up.png')
+pygame.mixer.music.play(-1)
+music_playing = True
 
 pygame.display.set_caption("Space Invader")
 icon = pygame.image.load('ufo-flying.png')
 pygame.display.set_icon(icon)
+def khoiTaoEnemy():
+    enemy = []
+    num_of_enemies = 6
+    for i in range(num_of_enemies):
+        enemyTam = Enemy(pygame.image.load('final-boss.png'), random.randint(0, 736), random.randint(50, 150), 4, 40)
+        enemy.append(enemyTam)
+    return enemy
 
-playerImg = pygame.image.load('spaceship.png')
-playerX = 370
-playerY = 480
-playerX_change = 0
+def khoiTaoThienThach():
+    # khoi tao thien thach
+    thienThach = []
+    num_of_meteorite = 2
 
-enemyImg = []
-enemyX = []
-enemyY = []
-enemyX_change = []
-enemyY_change = []
-num_of_enemies = 6
+    for i in range(num_of_meteorite):
+        thienThachTam = ThienThach(pygame.image.load('meteorite.png'),random.randint(0, 480), 0, 2)
+        thienThach.append(thienThachTam)
+    return thienThach
 
-for i in range(num_of_enemies):
-    enemyImg.append(pygame.image.load('final-boss.png'))
-    enemyX.append(random.randint(0, 736))
-    enemyY.append(random.randint(50, 150))
-    enemyX_change.append(4)
-    enemyY_change.append(40)
-
-bulletImg = pygame.image.load('bullet.png')
-bulletX = 0
-bulletY = 480
-bulletX_change = 0
-bulletY_change = 10
-bullet_state = "ready"
 
 score_value = 0
 font = pygame.font.Font('freesansbold.ttf', 32)
@@ -60,48 +70,52 @@ game_mode = 1
 
 # start
 def start_screen(screen):
-    global game_mode, SERVER
+    global game_mode, SERVER, volumeImg, music_playing
 
     manager = pygame_gui.UIManager((800, 600))
 
     # Create input
-    title = pygame_gui.elements.UILabel(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 150), (200, 50)),
-        text="Space Invader",
-        manager=manager,
-    )
-
     playerNameEntry = pygame_gui.elements.UITextEntryLine(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 50), (200, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 70), (200, 50)),
         manager=manager,
         placeholder_text="Type your name"
     )
-
     ipEntry = pygame_gui.elements.UITextEntryLine(
-        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2), (200, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 100, 600 / 2 - 20), (200, 50)),
         manager=manager,
         placeholder_text="Type IP"
     )
 
     # Create start button
     buttonPractice = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 50), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 30), (150, 50)),
         text="Practice",
         manager=manager,
     )
 
     buttonCompete = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 100), (100, 50)),
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 80), (150, 50)),
         text="Fight",
         manager=manager,
     )
 
-    buttonQuit = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 50, 600 / 2 + 150), (100, 50)),
-        text="Quit",
+    buttonThreeplayer = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 130), (150, 50)),
+        text="ThreePlayer",
         manager=manager,
     )
 
+    buttonFourplayer = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 180), (150, 50)),
+        text="FourPlayer",
+        manager=manager,
+    )
+
+    buttonQuit = pygame_gui.elements.UIButton(
+        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 230), (150, 50)),
+        text="Quit",
+        manager=manager,
+    )
     # Create clock to control frame rate
     clock = pygame.time.Clock()
 
@@ -113,6 +127,19 @@ def start_screen(screen):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # Kiểm tra xem click vào hình chữ nhật chứa biểu tượng loa hay không
+                if rect.collidepoint(event.pos):
+                    # Nếu đang phát âm thanh, tạm ngừng phát
+                    if not music_playing:
+                        volumeImg = pygame.image.load('volume-up.png')
+                        pygame.mixer.music.play(-1)
+                        music_playing = True
+                    else:
+                        pygame.mixer.music.stop()
+                        volumeImg = pygame.image.load('mute.png')
+                        music_playing = False
+
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == buttonPractice:
                     game_mode = GameModeConstraints.PRACTICE
@@ -120,7 +147,7 @@ def start_screen(screen):
                         playerNameEntry.focus()
                         ipEntry.unfocus()
                     else:
-                        return playerNameEntry.text.strip()
+                        return startGame(playerNameEntry.text.strip())
                 elif event.ui_element == buttonCompete:
                     game_mode = GameModeConstraints.TWO_PLAYERS
                     if playerNameEntry.text == "":
@@ -140,7 +167,47 @@ def start_screen(screen):
                         else:
                             SERVER = txt
                             print(SERVER)
-                            return playerNameEntry.text.strip()
+                            return startGame(playerNameEntry.text.strip())
+                elif event.ui_element == buttonThreeplayer:
+                    game_mode = GameModeConstraints.THREE_PLAYERS
+                    if playerNameEntry.text == "":
+                        playerNameEntry.focus()
+                        ipEntry.unfocus()
+                    elif ipEntry.text == "":
+                        playerNameEntry.unfocus()
+                        ipEntry.focus()
+                    else:
+                        txt = ipEntry.text
+                        x = re.search(
+                            "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                            txt)
+                        if not x:
+                            playerNameEntry.unfocus()
+                            ipEntry.focus()
+                        else:
+                            SERVER = txt
+                            print(SERVER)
+                            return startGame(playerNameEntry.text.strip())
+                elif event.ui_element == buttonFourplayer:
+                    game_mode = GameModeConstraints.FOUR_PLAYERS
+                    if playerNameEntry.text == "":
+                        playerNameEntry.focus()
+                        ipEntry.unfocus()
+                    elif ipEntry.text == "":
+                        playerNameEntry.unfocus()
+                        ipEntry.focus()
+                    else:
+                        txt = ipEntry.text
+                        x = re.search(
+                            "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$",
+                            txt)
+                        if not x:
+                            playerNameEntry.unfocus()
+                            ipEntry.focus()
+                        else:
+                            SERVER = txt
+                            print(SERVER)
+                            return startGame(playerNameEntry.text.strip())
                 elif event.ui_element == buttonQuit:
                     pygame.quit()
                     quit()
@@ -148,13 +215,16 @@ def start_screen(screen):
 
         manager.update(time_delta)
         screen.blit(background, (0, 0))
+        screen.blit(volumeImg, (760, 15))
+        title = pygame.image.load('spacelogo-image.png')
+        screen.blit(title, (255, 60))
         manager.draw_ui(screen)
-        title.show()
         pygame.display.update()
 
 
 # back
 def back_screen(screen, msg):
+
     manager = pygame_gui.UIManager((800, 600))
 
     buttonBack = pygame_gui.elements.UIButton(
@@ -180,6 +250,7 @@ def back_screen(screen, msg):
             manager.process_events(event)
         manager.update(time_delta)
         screen.blit(background, (0, 0))
+        screen.blit(volumeImg, (760, 15))
         manager.draw_ui(screen)
         game_over_text(msg)
         show_score(320, 300)
@@ -199,115 +270,186 @@ def game_over_text(msg):
     screen.blit(over_text, (200, 150))
 
 
-def player(x, y):
-    screen.blit(playerImg, (x, y))
-
-
-def enemy(x, y, i):
-    screen.blit(enemyImg[i], (x, y))
-
-
-def fire_bullet(x, y):
-    global bullet_state
-    bullet_state = "fire"
-    screen.blit(bulletImg, (x + 16, y + 10))
-
-
-def isCollision(enemyX, enemyY, bulletX, bulletY):
-    distance = math.sqrt(math.pow(enemyX - bulletX, 2) + (math.pow(enemyY - bulletY, 2)))
-    if distance < 27:
-        return True
-    else:
-        return False
-
-
 # player name
-start = True
-running = True
 # Game Loop
-if start:
-    name_player = start_screen(screen)
-    if game_mode == GameModeConstraints.TWO_PLAYERS:
-        client = Client(SERVER)
-        client.send(name_player)
-        client.receive()
-    time = 60
-    start_ticks=pygame.time.get_ticks()
-    while running:
-        seconds = (pygame.time.get_ticks() - start_ticks) / 1000
+def startGame(name_player):
+    global score_value, volumeImg, music_playing
+    player = Player('', 'spaceship.png', 370, 480, 0, 5, 0)
+    bullet = Bullet(pygame.image.load('bullet.png'), 0, 480, 0, 10, "ready")
+    enemy = khoiTaoEnemy()
+    thienThach = khoiTaoThienThach()
+    start = True
+    running = True
 
-        screen.fill((0, 0, 0))
+    if start:
+        if game_mode == GameModeConstraints.TWO_PLAYERS:
+            client = Client(SERVER)
+            client.send(name_player)
+            client.send(str(game_mode))
+            client.receive()
+        elif game_mode == GameModeConstraints.THREE_PLAYERS:
+            client = Client(SERVER)
+            client.send(name_player)
+            client.send(str(game_mode))
+            client.receive()
+        elif game_mode == GameModeConstraints.FOUR_PLAYERS:
+            client = Client(SERVER)
+            client.send(name_player)
+            client.send(str(game_mode))
+            client.receive()
+        time = 60
+        score_value = 0
+        start_ticks = pygame.time.get_ticks()
+        while running:
+            seconds = (pygame.time.get_ticks() - start_ticks) / 1000
 
-        screen.blit(background, (0, 0))
+            screen.fill((0, 0, 0))
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    playerX_change = -3
-                if event.key == pygame.K_RIGHT:
-                    playerX_change = 3
-                if event.key == pygame.K_SPACE:
-                    if bullet_state == "ready":
-                        bulletSound = mixer.Sound("laser.wav")
-                        bulletSound.play()
-                        bulletX = playerX
-                        fire_bullet(bulletX, bulletY)
+            screen.blit(background, (0, 0))
+            for i in range(len(thienThach)):
+                if player.hp == 5:
+                    playerHPImg = pygame.image.load('Asset 1.png')
+                elif player.hp == 4:
+                    playerHPImg = pygame.image.load('Asset 2.png')
+                elif player.hp == 3:
+                    playerHPImg = pygame.image.load('Asset 3.png')
+                elif player.hp == 2:
+                    playerHPImg = pygame.image.load('Asset 4.png')
+                else:
+                    playerHPImg = pygame.image.load('Asset 5.png')
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                    playerX_change = 0
+                screen.blit(playerHPImg, (540, 10))
 
-        playerX += playerX_change
-        if playerX <= 0:
-            playerX = 0
-        elif playerX >= 736:
-            playerX = 736
+                if thienThach[i].y > 600:
+                    thienThach[i].x = random.randint(0, 736)
+                    thienThach[i].y = 0
 
-        for i in range(num_of_enemies):
-            if enemyY[i] > 440 or seconds >= time:
-                for j in range(num_of_enemies):
-                    enemyY[j] = 2000
-                msg = "GAME OVER!"
-                if game_mode == GameModeConstraints.TWO_PLAYERS:
-                    client.send(str(score_value))
-                    result = client.receive()
-                    msg = result
-                    client.send(Client.DISCONNECT_MESSAGE)
-                back_screen(screen, msg)
-                break
+                if thienThach[i].y >= 0 :
+                    thienThach[i].show(screen)
+                    thienThach[i].y += thienThach[i].y_change
 
-            enemyX[i] += enemyX_change[i]
-            if enemyX[i] <= 0:
-                enemyX_change[i] = 2
-                enemyY[i] += enemyY_change[i]
-            elif enemyX[i] >= 736:
-                enemyX_change[i] = -2
-                enemyY[i] += enemyY_change[i]
+                collide = thienThach[i].isCollide(player)
+                if collide:
+                    explosionSound = mixer.Sound("explosion.wav")
+                    explosionSound.play()
+                    thienThach[i].x = random.randint(0, 480)
+                    thienThach[i].y = 0
+                    player.hp -= 1
 
-            collision = isCollision(enemyX[i], enemyY[i], bulletX, bulletY)
-            if collision:
-                explosionSound = mixer.Sound("explosion.wav")
-                explosionSound.play()
-                bulletY = 480
-                bullet_state = "ready"
-                score_value += 1
-                enemyX[i] = random.randint(0, 736)
-                enemyY[i] = random.randint(50, 150)
+                    if player.hp <= 0:
+                        msg = "GAME OVER!"
+                        if game_mode == GameModeConstraints.TWO_PLAYERS:
+                            client.send(str(score_value))
+                            result = client.receive()
+                            msg = result
+                            client.send(Client.DISCONNECT_MESSAGE)
+                        elif game_mode == GameModeConstraints.THREE_PLAYERS:
+                            client.send(str(score_value))
+                            result = client.receive()
+                            msg = result
+                            client.send(Client.DISCONNECT_MESSAGE)
+                        elif game_mode == GameModeConstraints.FOUR_PLAYERS:
+                            client.send(str(score_value))
+                            result = client.receive()
+                            msg = result
+                            client.send(Client.DISCONNECT_MESSAGE)
+                        back_screen(screen, msg)
+                        break
 
-            enemy(enemyX[i], enemyY[i], i)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    # Kiểm tra xem click vào hình chữ nhật chứa biểu tượng loa hay không
+                    if rect.collidepoint(event.pos):
+                        # Nếu đang phát âm thanh, tạm ngừng phát
+                        if not music_playing:
+                            volumeImg = pygame.image.load('volume-up.png')
+                            pygame.mixer.music.play(-1)
+                            music_playing = True
+                        else:
+                            pygame.mixer.music.stop()
+                            volumeImg = pygame.image.load('mute.png')
+                            music_playing = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        player.x_change = -3
+                    if event.key == pygame.K_RIGHT:
+                        player.x_change = 3
+                    if event.key == pygame.K_SPACE:
+                        if bullet.state == "ready":
+                            bulletSound = mixer.Sound("laser.wav")
+                            bulletSound.play()
+                            bullet.x = player.x
+                            bullet.fire_bullet(screen )
 
-        if bulletY <= 0:
-            bulletY = 480
-            bullet_state = "ready"
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                        player.x_change = 0
 
-        if bullet_state == "fire":
-            fire_bullet(bulletX, bulletY)
-            bulletY -= bulletY_change
+            player.x += player.x_change
+            if player.x <= 0:
+                player.x = 0
+            elif player.x >= 736:
+                player.x = 736
 
-        player(playerX, playerY)
-        show_score(textX, testY)
-        show_time(time - seconds)
-        pygame.display.update()
+            for i in range(len(enemy)):
+                if enemy[i].y > 440 or seconds >= time:
+                    for j in range(len(enemy)):
+                        enemy[j].y = 2000
+                    msg = "GAME OVER!"
+                    if game_mode == GameModeConstraints.TWO_PLAYERS:
+                        client.send(str(score_value))
+                        result = client.receive()
+                        msg = result
+                        client.send(Client.DISCONNECT_MESSAGE)
+                    elif game_mode == GameModeConstraints.THREE_PLAYERS:
+                        client.send(str(score_value))
+                        result = client.receive()
+                        msg = result
+                        client.send(Client.DISCONNECT_MESSAGE)
+                    elif game_mode == GameModeConstraints.FOUR_PLAYERS:
+                        client.send(str(score_value))
+                        result = client.receive()
+                        msg = result
+                        client.send(Client.DISCONNECT_MESSAGE)
+                    back_screen(screen, msg)
 
+                    break
+
+                enemy[i].x += enemy[i].x_change
+                if enemy[i].x <= 0:
+                    enemy[i].x_change = 2
+                    enemy[i].y += enemy[i].y_change
+                elif enemy[i].x >= 736:
+                    enemy[i].x_change = -2
+                    enemy[i].y += enemy[i].y_change
+
+                collision = enemy[i].isCollision(bullet)
+                if collision:
+                    explosionSound = mixer.Sound("score.wav")
+                    explosionSound.play()
+                    bullet.y = 480
+                    bullet.state = "ready"
+                    score_value += 1
+                    enemy[i].x = random.randint(0, 736)
+                    enemy[i].y = random.randint(50, 150)
+
+                enemy[i].show(screen)
+
+            if bullet.y <= 0:
+                bullet.y = 480
+                bullet.state = "ready"
+
+            if bullet.state == "fire":
+                bullet.fire_bullet(screen)
+                bullet.y -= bullet.y_change
+
+            screen.blit(volumeImg, (760, 15))
+            player.show(screen)
+            show_score(textX, testY)
+            show_time(time - seconds)
+            pygame.display.update()
+
+
+start_screen(screen)

@@ -2,9 +2,9 @@ import socket
 
 
 class Client:
-    HEADER = 64
+    HEADER = 128
     PORT = 5050
-    SERVER = "172.20.10.2"
+    SERVER = "192.168.116.1"
     FORMAT = 'utf-8'
 
     START_GAME_MESSAGE = 'START'
