@@ -5,6 +5,8 @@ import pygame
 
 from Player import Player
 from GameModeConstraints import GameModeConstraints
+from Message import Message
+from PlayerServer import PlayerServer
 
 HEADER = 128
 PORT = 5050
@@ -17,12 +19,46 @@ DISCONNECT_MESSAGE = 'DISCONNECT'
 
 start_game = False
 players = []
+amount_player = 0
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 
 
-def checkSuccess():
+def start_game_function(conn, addr):
+    global amount_player, players, start_game
+    name_player = receive(conn, addr)
+    player = PlayerServer(name_player)
+    players.append(player)
+
+    amount_player = int(receive(conn, addr))
+
+    while len(players) != amount_player:
+        pass
+
+    start_game = True
+
+    send(conn, START_GAME_MESSAGE)
+    return player
+
+
+def finish_game(conn, addr, player):
+    global amount_player, players
+    score = int(receive(conn, addr))
+    player.score = score
+
+    while not check_success():
+        pass
+
+    players.sort(key=lambda item: item.score, reverse=True)
+    players[0].ranking = 1
+    for i in range(1, len(players)):
+        players[i].ranking = players[i-1].ranking if players[i].score == players[i-1].score else players[i-1].ranking + 1
+
+    send(conn, str(player.ranking))
+
+
+def check_success():
     global players
 
     for player in players:
@@ -31,80 +67,28 @@ def checkSuccess():
     return True
 
 
-def setScore(name: str, score: int):
-    global players
-
-    for player in players:
-        if player.name == name:
-            player.score = score
-
-
-def getWinner():
-    global players
-    alive_players = [player for player in players if not player.isDead]
-    if not alive_players:
-        return None
-    max_score = max([player.score for player in alive_players])
-    winner = [player for player in alive_players if player.score == max_score]
-    if len(winner) == 1:
-        return winner[0]
-    else:
-        return None
-
-
 def handle_client(conn, addr):
-    global players
+    global players, start_game
+    player = None
 
     print(f"[NEW CONNECTION] {addr} connected.")
 
     connected = True
+
+    if start_game:
+        print("Server is full.")
+        connected = False
+
     while connected:
-        name_player = receive(conn, addr)
-        players.append(Player(name_player))
+        message = receive(conn, addr)
 
-        game_mode = int(receive(conn, addr))
-
-        max_players = {
-            GameModeConstraints.TWO_PLAYERS: 2,
-            GameModeConstraints.THREE_PLAYERS: 3,
-            GameModeConstraints.FOUR_PLAYERS: 4,
-        }
-
-        while len(players) != max_players[game_mode]:
-            pass
-
-        send(conn, START_GAME_MESSAGE)
-
-        score = receive(conn, addr)
-        if score != '':
-            score = int(score)
-        else:
-            score = 0
-        setScore(name_player, score)
-
-        while not checkSuccess():
-            pass
-
-        player = Player(name_player)
-        player.isDead = True
-
-        alive_players = [p for p in players if not p.isDead]
-        if alive_players:
-            send(conn, "WAITING")
-            while len(alive_players) > 0:
-                alive_players = [p for p in players if not p.isDead]
-
-        winner = getWinner()
-        if winner is not None and winner.name == name_player:
-            send(conn, "You win!")
-        else:
-            send(conn, "You lose!")
-
-        players.clear()
-
-        msg = receive(conn, addr)
-        if msg == DISCONNECT_MESSAGE:
+        if message == Message.START_GAME:
+            player = start_game_function(conn, addr)
+        elif message == Message.FINISH_GAME:
+            finish_game(conn, addr, player)
+        elif message == DISCONNECT_MESSAGE:
             connected = False
+            start_game = False
     conn.close()
 
 
@@ -117,6 +101,7 @@ def receive(conn, addr):
 
         print(f"[{addr}] {msg}")
     return msg
+
 
 def send(conn, msg):
     message = msg.encode(FORMAT)
@@ -137,16 +122,7 @@ def start():
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
-        if threading.active_count() == 3:
-            start_game = True
-        elif threading.active_count() == 4:
-            start_game = True
-        elif threading.active_count() == 5:
-            start_game = True
-        elif threading.active_count() > 5:
-            print("Server is full.")
 
 
 print("[STARTING] Server is starting...")
 start()
-
