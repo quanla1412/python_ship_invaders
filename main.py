@@ -1,5 +1,7 @@
 
 import random
+import sys
+
 import pygame
 from pygame import mixer
 import pygame_gui
@@ -115,12 +117,6 @@ def start_screen(screen):
         text="FourPlayer",
         manager=manager,
     )
-
-    buttonQuit = pygame_gui.elements.UIButton(
-        relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 230), (150, 50)),
-        text="Quit",
-        manager=manager,
-    )
     # Create clock to control frame rate
     clock = pygame.time.Clock()
 
@@ -131,7 +127,7 @@ def start_screen(screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
+                sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 # Kiểm tra xem click vào hình chữ nhật chứa biểu tượng loa hay không
                 if rect.collidepoint(event.pos):
@@ -146,10 +142,7 @@ def start_screen(screen):
                         music_playing = False
 
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
-                if event.ui_element == buttonQuit:
-                    pygame.quit()
-                    quit()
-                elif event.ui_element == buttonPractice:
+                if event.ui_element == buttonPractice:
                     game_mode = GameModeConstraints.PRACTICE
                     if playerNameEntry.text == "":
                         playerNameEntry.focus()
@@ -220,7 +213,7 @@ def game_over_screen(screen):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-                quit()
+                sys.exit()
             if event.type == pygame_gui.UI_BUTTON_PRESSED:
                 if event.ui_element == buttonBack:
                     start_screen(screen)
@@ -229,7 +222,7 @@ def game_over_screen(screen):
         screen.blit(background, (0, 0))
         screen.blit(volumeImg, (760, 15))
         manager.draw_ui(screen)
-        game_over_text(msg)
+        game_over_text("Game over!")
         show_score(320, 300)
         pygame.display.update()
 
@@ -320,7 +313,8 @@ def startGame(name_player):
             #Xử lý button
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    pygame.quit()
+                    sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     # Kiểm tra xem click vào hình chữ nhật chứa biểu tượng loa hay không
                     if rect.collidepoint(event.pos):
@@ -374,7 +368,8 @@ def startGame(name_player):
 
                 collision = enemy[i].isCollision(bullet)
                 if collision:
-                    explosionSound.play()
+                    if music_playing:
+                        explosionSound.play()
                     bullet.y = 480
                     bullet.state = "ready"
                     score_value += 1
