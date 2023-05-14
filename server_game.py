@@ -41,10 +41,11 @@ def setScore(name: str, score: int):
 
 def getWinner():
     global players
-    if not players:
+    alive_players = [player for player in players if not player.isDead]
+    if not alive_players:
         return None
-    max_score = max([player.score for player in players])
-    winner = [player for player in players if player.score == max_score]
+    max_score = max([player.score for player in alive_players])
+    winner = [player for player in alive_players if player.score == max_score]
     if len(winner) == 1:
         return winner[0]
     else:
@@ -80,13 +81,25 @@ def handle_client(conn, addr):
         else:
             score = 0
         setScore(name_player, score)
+
         while not checkSuccess():
             pass
+
+        player = Player(name_player)
+        player.isDead = True
+
+        alive_players = [p for p in players if not p.isDead]
+        if alive_players:
+            send(conn, "WAITING")
+            while len(alive_players) > 0:
+                alive_players = [p for p in players if not p.isDead]
+
         winner = getWinner()
         if winner is not None and winner.name == name_player:
             send(conn, "You win!")
         else:
             send(conn, "You lose!")
+
         players.clear()
 
         msg = receive(conn, addr)

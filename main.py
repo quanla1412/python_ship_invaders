@@ -338,6 +338,7 @@ def startGame(name_player):
 
                     if player.hp <= 0:
                         msg = "GAME OVER!"
+                        player.isDead = True
                         if game_mode == GameModeConstraints.TWO_PLAYERS:
                             client.send(str(score_value))
                             result = client.receive()
@@ -398,6 +399,7 @@ def startGame(name_player):
                     for j in range(len(enemy)):
                         enemy[j].y = 2000
                     msg = "GAME OVER!"
+                    player.isDead = True
                     if game_mode == GameModeConstraints.TWO_PLAYERS:
                         client.send(str(score_value))
                         result = client.receive()
