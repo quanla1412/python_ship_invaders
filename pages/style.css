@@ -1,0 +1,10 @@
+.img-avatar {
+    max-height: 250px;
+    max-width: 100%;
+    object-fit: cover;
+    object-position: 25% 25%;
+  }
+
+.information-div {
+  background-color: #86c1dd;
+}

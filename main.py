@@ -102,19 +102,19 @@ def start_screen(screen):
 
     buttonCompete = pygame_gui.elements.UIButton(
         relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 80), (150, 50)),
-        text="Fight",
+        text="2 Players",
         manager=manager,
     )
 
     buttonThreePlayer = pygame_gui.elements.UIButton(
         relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 130), (150, 50)),
-        text="ThreePlayer",
+        text="3 Players",
         manager=manager,
     )
 
     buttonFourPlayer = pygame_gui.elements.UIButton(
         relative_rect=pygame.Rect((800 / 2 - 75, 600 / 2 + 180), (150, 50)),
-        text="FourPlayer",
+        text="4 Players",
         manager=manager,
     )
     # Create clock to control frame rate
@@ -354,7 +354,7 @@ def startGame(name_player):
                 if enemy[i].y > 440 or seconds >= time:
                     for j in range(len(enemy)):
                         enemy[j].y = 2000
-                    game_over_screen(screen, score_value)
+                    game_over_screen(screen)
 
                     break
 
