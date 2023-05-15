@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ship Invaders</title>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="style.css">
+  </head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Ship invaders</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="#div-about-game">About game</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" aria-current="page" href="#div-download-game">Download game</a>
+          </li>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="information-div">
+    <h3 class="pt-5 text-center mb-4">Team The boys</h3>
+    <div class="containerd d-flex justify-content-around pb-5" >
+        <div class="card" style="width: 18rem;">
+            <img src="./resources/image/quan.jpg" class="img-avatar card img-top" alt="...">
+            <div class="card-body">
+              <h5 class="card-title">Lê Anh Quân</h5>
+              <h6 class="card-subtitle mb-2 text-body-secondary">Nhóm trưởng</h6>      
+              <p class="card-text">MSSV: 3120410434</p>
+            </div>
+        </div>
+        <div class="card" style="width: 18rem;">
+          <img src="./resources/image/tanphan.jpg" class="img-avatar card img-top" alt="...">
+          <div class="card-body">
+            <h5 class="card-title">Phan Hoàng Nhật Tân</h5>
+            <h6 class="card-subtitle mb-2 text-body-secondary">Thành viên</h6>      
+            <p class="card-text">MSSV: 3120410466</p>
+          </div>
+      </div>
+      <div class="card" style="width: 18rem;">
+        <img src="./resources/image/tannho.jpg" class="img-avatar card img-top" alt="...">
+        <div class="card-body">
+          <h5 class="card-title">Đinh Nhật Tân</h5>
+          <h6 class="card-subtitle mb-2 text-body-secondary">Thành viên</h6>      
+          <p class="card-text">MSSV: 3120410463</p>
+        </div>
+    </div>
+    <div class="card" style="width: 18rem;">
+      <img src="./resources/image/thanh.jpg" class="img-avatar card img-top" alt="...">
+      <div class="card-body">
+        <h5 class="card-title">Lê Anh Quân</h5>
+        <h6 class="card-subtitle mb-2 text-body-secondary">Thành viên</h6>      
+        <p class="card-text">MSSV: 3120410472</p>
+      </div>
+  </div>
+    </div>
+  </div>
+
+  <div id="div-about-game">
+    <h3 class="pt-5 text-center mb-4">Thông tin về game</h3>
+    <div class="container">
+      <p class="text-center">Hành trình tiêu diệt các quái vật giải cứu vũ trụ khỏi hiểm nguy</p>
+    </div>
+  </div>
+
+  <div id="div-download-game" class = "div-download py-5" >
+    <h3 class="text-center mb-4">Download game</h3>
+    <div class="container">
+      <div class="container d-flex justify-content-center">
+        <a href="../ShipInvaders.exe" ><button type="button" class="btn btn-light me-5">Download client</button></a>   
+        <a href="../server_game.py" ><button type="button" class="btn btn-light">Download server</button></a>   
+      </div>
+      <div class="container">
+        <h5>Bước 1</h5>
+        <p>Tải file game về từ nút bấm download client ở trên. Nếu muốn chơi chế độ nhiều người chơi thì bấm thêm nút Download server</p>
+      </div>
+      <div class="container">
+        <h5>Bước 2</h5>
+        <p>Cài đặt file ShipInvaders.exe đã được cài</p>
+      </div>
+      <div class="container">
+        <h5>Bước 3</h5>
+        <p>Vào trong thư mục ShipInvaders ở vị trí được chọn khi cài đặt trong bước 2. Chạy file main.exe</p>
+      </div>
+      <div class="container">
+        <h5>Bước 4 (Nếu chơi chế độ nhiều người)</h5>
+        <p>Người dùng tải và cài đặt python vào máy. <a href="https://wiki.tino.org/cach-tai-va-cai-dat-python/">Cách tải python</a></p>
+      </div>
+      <div class="container">
+        <h5>Bước 4 (Nếu chơi chế độ nhiều người)</h5>
+        <p>Vào trong thư mục chứa file server_game.py được tải. Bấm vào ô địa chỉ, gõ "cmd" rồi bấm Enter.</p>
+      </div>
+      <div class="container">
+        <h5>Bước 5 (Nếu chơi chế độ nhiều người)</h5>
+        <p>Khi này, 1 cửa sổ console màu đen sẽ được mở lên. Người dùng nhập "python server_game.py" rồi bấm Enter</p>
+      </div>
+      <div class="container">
+        <h5>Bước 6 (Nếu chơi chế độ nhiều người)</h5>
+        <p>Sau đó, màn hình sẽ xuất ra 1 địa chỉ IP. Ví dụ: 192.168.1.12. Người chơi nhập địa chỉ này vào ô Type IP sau đó bấm các nút chế độ chơi theo ý muốn</p>
+      </div>
+    </div>
+  </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+</body>
+</html>

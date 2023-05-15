@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .img-avatar {
     max-height: 250px;
     max-width: 100%;
@@ -5,6 +9,7 @@
     object-position: 25% 25%;
   }
 
-.information-div {
+.information-div, .div-download {
   background-color: #86c1dd;
 }
+
