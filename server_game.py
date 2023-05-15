@@ -89,6 +89,7 @@ def handle_client(conn, addr):
         elif message == DISCONNECT_MESSAGE:
             connected = False
             start_game = False
+            players.clear()
     conn.close()
 
 

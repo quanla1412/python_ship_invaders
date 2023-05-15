@@ -75,6 +75,7 @@ SERVER = ""
 game_mode = 1
 client = None
 
+
 # start
 def start_screen(screen):
     global game_mode, SERVER, volumeImg, music_playing
@@ -189,6 +190,7 @@ def start_screen(screen):
 # back
 def game_over_screen(screen):
     global client
+    msg = "Game over!"
     if game_mode != GameModeConstraints.PRACTICE:
         client.send(Message.FINISH_GAME)
         client.send(str(score_value))
@@ -222,7 +224,7 @@ def game_over_screen(screen):
         screen.blit(background, (0, 0))
         screen.blit(volumeImg, (760, 15))
         manager.draw_ui(screen)
-        game_over_text("Game over!")
+        game_over_text(msg)
         show_score(320, 300)
         pygame.display.update()
 
@@ -308,7 +310,7 @@ def startGame(name_player):
 
                     if player.hp <= 0:
                         game_over_screen(screen)
-                        break
+                        return
 
             #Xử lý button
             for event in pygame.event.get():
